@@ -2,10 +2,12 @@
 
 # Percorso principale
 base_dir="/mnt/c/Users/mmatteis/Documents/Sources"
+# Versione di default per Ansible virtualenv
+base_ansible="9.2.0"
 # Percorso per il file nascosto che memorizza l'ultima directory usata
 last_used_file="$HOME/.last_used_directory"
 
-# Trova tutte le directory di primo e secondo livello
+# Trova tutte le directory di secondo livello (sottolivelli)
 dirs=($(find "$base_dir" -mindepth 2 -maxdepth 2 -type d))
 
 # Carica l'ultima directory usata, se esiste
@@ -15,31 +17,38 @@ else
   last_used_dir=""
 fi
 
-# Mostra l'elenco numerato delle directory di secondo livello con righe vuote per i gruppi
+# Mostra l'elenco delle directory raggruppate con intestazioni per il primo livello
 echo -e "\nSeleziona una directory:\n"
 previous_first_level_dir=""
+counter=0
 
-for i in "${!dirs[@]}"; do
-  # Estrai la directory di primo livello dalla directory corrente
-  first_level_dir=$(dirname "${dirs[$i]}") 
+for dir in "${dirs[@]}"; do
+  # Estrai la directory di primo livello e il nome della sottocartella
+  first_level_dir=$(basename "$(dirname "$dir")")
+  sub_dir=$(basename "$dir")
 
-  # Se la directory di primo livello è cambiata, aggiungi una riga vuota
-  if [ "$first_level_dir" != "$previous_first_level_dir" ] && [ -n "$previous_first_level_dir" ]; then
-    echo ""  # Riga vuota tra i gruppi
+  # Se la directory di primo livello è cambiata, stampa una riga vuota e l'intestazione
+  if [ "$first_level_dir" != "$previous_first_level_dir" ]; then
+    if [ -n "$previous_first_level_dir" ]; then
+      echo ""  # Riga vuota tra i gruppi
+    fi
+    # Stampa il titolo della cartella principale in "arancione" e grassetto
+    echo -e "\e[1;38;5;214m$first_level_dir\e[0m"
+    previous_first_level_dir="$first_level_dir"
   fi
 
-  # Se la directory corrente è l'ultima usata, evidenziala in verde
-  if [ "${dirs[$i]}" == "$last_used_dir" ]; then
-    echo -e "\e[32m$i) ${dirs[$i]#$base_dir/} (ultima usata)\e[0m"
+  # Evidenzia l'ultima directory usata in verde
+  if [ "$dir" == "$last_used_dir" ]; then
+    echo -e "\e[32m$counter) $sub_dir (ultima usata)\e[0m"
   else
-    echo "$i) ${dirs[$i]#$base_dir/}"
+    echo "$counter) $sub_dir"
   fi
 
-  # Aggiorna la directory di primo livello precedente
-  previous_first_level_dir="$first_level_dir"
+  # Incrementa il contatore
+  ((counter++))
 done
 
-echo ""  # Riga vuota alla fine della lista
+echo ""  # Riga vuota alla fine dell'elenco
 
 # Richiedi l'input all'utente
 read -p "Digita il numero della directory (premi Invio per l'ultima usata): " choice
@@ -53,15 +62,16 @@ if [ -z "$choice" ]; then
     chosen_dir="$last_used_dir"
   else
     echo "Nessuna directory selezionata in precedenza o directory non trovata."
+    exit 1
   fi
 else
   # Verifica che l'input sia un numero valido e seleziona la directory
-  if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 0 ] && [ "$choice" -lt "${#dirs[@]}" ]; then
-    # Memorizza la directory scelta nel file nascosto
+  if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 0 ] && [ "$choice" -lt "$counter" ]; then
     chosen_dir="${dirs[$choice]}"
     echo "$chosen_dir" > "$last_used_file"
   else
     echo "Scelta non valida."
+    exit 1
   fi
 fi
 
@@ -72,11 +82,10 @@ if [ -n "$chosen_dir" ]; then
 fi
 
 # Attiva ansible virtualenv
-if [ -z "$1" ]
-then
-    workon ansible9.2.0
+if [ -z "$1" ]; then
+    workon "ansible$base_ansible"
 else
-    workon ansible$1
+    workon "ansible$1"
 fi
 
 #kinit mmatteis@TOPTIERRA.IT
