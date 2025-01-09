@@ -81,11 +81,15 @@ if [ -n "$chosen_dir" ]; then
   echo "Ora sei in: $(pwd)"
 fi
 
-# Attiva ansible virtualenv
-if [ -z "$1" ]; then
+# Controlla la presenza del file ansible.cfg e attiva il virtualenv solo se esiste
+if [ -f "$chosen_dir/ansible.cfg" ]; then
+  if [ -z "$1" ]; then
     workon "ansible$base_ansible"
-else
+  else
     workon "ansible$1"
+  fi
+else
+  echo "Virtualenv Ansible non attivato."
 fi
 
 #kinit mmatteis@TOPTIERRA.IT

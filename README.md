@@ -10,9 +10,9 @@ Execute the following command to add START alias:
 `start`
 
 will list folders under the Sources directory set in the variable "base_dir"
-and will enable ansible9.2.0 virtualenv (default set in the variable "base_ansible")
+and will enable ansible9.2.0 virtualenv (default set in the variable "base_ansible") only if ansible.cfg file is found in the directory.
 
 `start X.X.X`
 
 will list folders under the Sources directory set in the variable "base_dir"
-and will enable ansibleX.X.X virtualenv.
+and will enable ansibleX.X.X virtualenv only if ansible.cfg file is found in the directory.
