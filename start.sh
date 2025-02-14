@@ -50,6 +50,9 @@ done
 
 echo ""  # Riga vuota alla fine dell'elenco
 
+# Disattiva ansible env a prescindere (senza errori in output)
+deactivate 2>/dev/null
+
 # Richiedi l'input all'utente
 read -p "Digita il numero della directory (premi Invio per l'ultima usata): " choice
 
