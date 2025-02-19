@@ -3,12 +3,15 @@
 # Percorso principale
 base_dir="/mnt/c/Users/mmatteis/Documents/Sources"
 # Versione di default per Ansible virtualenv
-base_ansible="9.2.0"
+base_ansible="11.2.0"
 # Percorso per il file nascosto che memorizza l'ultima directory usata
 last_used_file="$HOME/.last_used_directory"
 
 # Trova tutte le directory di secondo livello (sottolivelli)
 dirs=($(find "$base_dir" -mindepth 2 -maxdepth 2 -type d))
+
+# Pulisce schermo
+clear
 
 # Carica l'ultima directory usata, se esiste
 if [ -f "$last_used_file" ]; then
@@ -50,7 +53,7 @@ done
 
 echo ""  # Riga vuota alla fine dell'elenco
 
-# Disattiva ansible env a prescindere (senza errori in output)
+# Disattiva ansible env a prescindere (senza errori in output)                                                                                                                                                   deactivate 2>/dev/null
 deactivate 2>/dev/null
 
 # Richiedi l'input all'utente
@@ -81,7 +84,6 @@ fi
 # Effettua il cd nella directory selezionata se è stata scelta una directory
 if [ -n "$chosen_dir" ]; then
   cd "$chosen_dir"
-  echo "Ora sei in: $(pwd)"
 fi
 
 # Controlla la presenza del file ansible.cfg e attiva il virtualenv solo se esiste
@@ -95,4 +97,4 @@ else
   echo "Virtualenv Ansible non attivato."
 fi
 
-#kinit mmatteis@TOPTIERRA.IT
+echo ""  # Riga vuota alla finale
